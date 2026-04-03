@@ -126,7 +126,3 @@ Bu yazılımın tüm telif hakları **Onur Zaim**'e aittir.
 ---
 
 _© 2026 Onur Zaim - Tüm Hakları Saklıdır._
-
-```
-
-```
