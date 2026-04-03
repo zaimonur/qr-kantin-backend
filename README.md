@@ -25,7 +25,7 @@ Bu proje, modern eğitim kurumları ve işletmeler için tasarlanmış, **Go (Go
 
 ## 📂 Proje Yapısı (Clean Architecture)
 
-````text
+```text
 ├── cmd
 │   └── main.go
 ├── go.mod
@@ -54,15 +54,18 @@ Bu proje, modern eğitim kurumları ve işletmeler için tasarlanmış, **Go (Go
 │       └── hub.go
 ├── LICENSE
 └── README.md
+```
 
 ## 🚀 Başlangıç
 
 ### Gereksinimler
-* **Go:** v1.25+
-* **PostgreSQL:** Veritabanı işlemleri için
-* **.env Dosyası:** Proje kök dizininde yapılandırılmalıdır
+
+- **Go:** v1.25+
+- **PostgreSQL:** Veritabanı işlemleri için
+- **.env Dosyası:** Proje kök dizininde yapılandırılmalıdır
 
 ### Kurulum ve Çalıştırma
+
 1.  **Projeyi Klonlayın:**
     ```bash
     git clone <repo-url>
@@ -87,27 +90,30 @@ Bu proje, modern eğitim kurumları ve işletmeler için tasarlanmış, **Go (Go
 ## 🔌 API Uç Noktaları (Endpoints)
 
 ### 🔓 Kamu (Public) Rotaları
-* `POST /auth/register` - Öğrenci kayıt başvurusu (Onaysız başlar)
-* `POST /auth/login` - Giriş yap ve JWT token al
+
+- `POST /auth/register` - Öğrenci kayıt başvurusu (Onaysız başlar)
+- `POST /auth/login` - Giriş yap ve JWT token al
 
 ### 📱 Kullanıcı (API) Rotaları (JWT Gerekli)
-* `GET /api/menu` - Aktif ve stokta olan ürün listesi
-* `POST /api/order` - Yeni sipariş oluşturma
-* `GET /api/wallet/balance` - Güncel bakiye sorgulama
-* `GET /api/wallet/history` - İşlem (yükleme/harcama) geçmişi
+
+- `GET /api/menu` - Aktif ve stokta olan ürün listesi
+- `POST /api/order` - Yeni sipariş oluşturma
+- `GET /api/wallet/balance` - Güncel bakiye sorgulama
+- `GET /api/wallet/history` - İşlem (yükleme/harcama) geçmişi
 
 ### 🛠 Yönetici (Admin) Rotaları (Admin Yetkisi Gerekli)
-* **Sipariş Yönetimi:**
-    * `GET /admin/orders` - Aktif siparişleri görüntüle
-    * `PUT /admin/orders/:id/approve` - Siparişi onayla ve stoktan düş
-    * `PUT /admin/orders/:id/ready` - Siparişi "Hazır" olarak işaretle
-    * `POST /admin/orders/complete` - QR kod ile siparişi teslim et
-* **Ürün ve Stok:**
-    * `POST /admin/products` - Yeni ürün ve reçete ekle
-    * `POST /admin/materials` - Stok girişi yap
-* **Kullanıcı ve Rapor:**
-    * `GET /admin/users/pending` - Onay bekleyen öğrencileri listele
-    * `GET /admin/reports/sales` - Detaylı satış ve ciro analizleri
+
+- **Sipariş Yönetimi:**
+  - `GET /admin/orders` - Aktif siparişleri görüntüle
+  - `PUT /admin/orders/:id/approve` - Siparişi onayla ve stoktan düş
+  - `PUT /admin/orders/:id/ready` - Siparişi "Hazır" olarak işaretle
+  - `POST /admin/orders/complete` - QR kod ile siparişi teslim et
+- **Ürün ve Stok:**
+  - `POST /admin/products` - Yeni ürün ve reçete ekle
+  - `POST /admin/materials` - Stok girişi yap
+- **Kullanıcı ve Rapor:**
+  - `GET /admin/users/pending` - Onay bekleyen öğrencileri listele
+  - `GET /admin/reports/sales` - Detaylı satış ve ciro analizleri
 
 ## ⚖️ Kullanım Şartları ve Lisans
 
@@ -118,5 +124,9 @@ Bu yazılımın tüm telif hakları **Onur Zaim**'e aittir.
 3.  **İletişim:** Ticari kullanım izinleri ve iş birliği için `zaimonur08@gmail.com` adresi üzerinden iletişime geçilmelidir.
 
 ---
-*© 2026 Onur Zaim - Tüm Hakları Saklıdır.*
-````
+
+_© 2026 Onur Zaim - Tüm Hakları Saklıdır._
+
+```
+
+```
