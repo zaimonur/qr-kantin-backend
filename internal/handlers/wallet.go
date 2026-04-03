@@ -72,7 +72,7 @@ func GetWalletHistory(c echo.Context) error {
 	var history []WalletTransaction
 
 	query := `
-		SELECT amount, transaction_type, source, TO_CHAR(o.created_at AT TIME ZONE 'Europe/Istanbul', 'YYYY-MM-DD HH24:MI') as created_at
+		SELECT amount, transaction_type, source, TO_CHAR(created_at AT TIME ZONE 'Europe/Istanbul', 'YYYY-MM-DD HH24:MI') as created_at
 		FROM wallet_transactions
 		WHERE user_id = $1
 		ORDER BY created_at DESC
