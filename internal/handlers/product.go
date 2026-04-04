@@ -1,9 +1,11 @@
 package handlers
 
 import (
+	"encoding/json"
 	"log"
 	"net/http"
 	"qr-kantin/internal/db"
+	"time"
 
 	"github.com/labstack/echo/v4"
 )
@@ -55,6 +57,19 @@ func CreateProduct(c echo.Context) error {
 
 // GetMenu: Sadece aktif ürünleri listeler (Mobil uygulama için kullanılacak)
 func GetMenu(c echo.Context) error {
+	ctx := c.Request().Context()
+	cacheKey := "kantin:menu"
+
+	// 1. Önce Redis'e Bak (Cache Hit kontrolü)
+	if db.RedisClient != nil {
+		cachedMenu, err := db.RedisClient.Get(ctx, cacheKey).Result()
+		if err == nil {
+			// Cache'de veri bulundu, direkt JSON olarak geri dönüyoruz
+			return c.Blob(http.StatusOK, "application/json", []byte(cachedMenu))
+		}
+	}
+
+	// 2. Cache'de Yoksa Veritabanından Çek
 	type MenuResponse struct {
 		ID       string  `db:"id" json:"id"`
 		Name     string  `db:"name" json:"name"`
@@ -67,7 +82,6 @@ func GetMenu(c echo.Context) error {
 
 	var products []MenuResponse
 
-	// NOT EXISTS ile reçetedeki HERHANGİ BİR malzemenin eksiğe düşüp düşmediğini kontrol ediyoruz.
 	query := `
 		SELECT p.id, p.name, p.price, CAST(p.category AS VARCHAR) as category, p.is_active, p.image_url,
 			NOT EXISTS (
@@ -88,6 +102,13 @@ func GetMenu(c echo.Context) error {
 
 	if products == nil {
 		products = []MenuResponse{}
+	}
+
+	// 3. Veritabanından Çekilen Veriyi Redis'e Kaydet (5 Dakikalık TTL)
+	if db.RedisClient != nil {
+		menuJSON, _ := json.Marshal(products)
+		// 5 dakika (300 saniye) cache'de tutuyoruz
+		db.RedisClient.Set(ctx, cacheKey, menuJSON, 5*time.Minute)
 	}
 
 	return c.JSON(http.StatusOK, products)
