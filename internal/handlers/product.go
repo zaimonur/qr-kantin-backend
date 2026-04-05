@@ -175,7 +175,7 @@ func DeleteProduct(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Ürün bulunamadı"})
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"message": "Ürün menüden mermi gibi kaldırıldı!"})
+	return c.JSON(http.StatusOK, map[string]string{"message": "Ürün menüden kaldırıldı!"})
 }
 
 // GetProductRecipe: Bir ürünün mevcut reçetesini (malzemelerini) getirir
@@ -222,7 +222,7 @@ func UpdateProduct(c echo.Context) error {
 	}
 
 	// 4. Ürünün Ana Bilgilerini Güncelleme
-	// updated_at = NOW() ekleyerek verinin değişim zamanını veritabanında mermi gibi izliyoruz.
+	// updated_at = NOW() ekleyerek verinin değişim zamanını veritabanında izliyoruz.
 	query := `UPDATE products SET name = $1, price = $2, category = $3, updated_at = NOW() WHERE id = $4`
 	_, err = tx.Exec(query, req.Name, req.Price, req.Category, id)
 	if err != nil {
@@ -258,5 +258,5 @@ func UpdateProduct(c echo.Context) error {
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Değişiklikler kaydedilemedi"})
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"message": "Ürün ve reçetesi mermi gibi güncellendi!"})
+	return c.JSON(http.StatusOK, map[string]string{"message": "Ürün ve reçetesi güncellendi!"})
 }

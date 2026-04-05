@@ -47,7 +47,7 @@ func AddBalance(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, map[string]interface{}{
-		"message":     "Bakiye mermi gibi yüklendi!",
+		"message":     "Bakiye yüklendi!",
 		"new_balance": newBalance,
 	})
 }

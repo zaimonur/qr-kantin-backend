@@ -277,7 +277,7 @@ func CompleteOrder(c echo.Context) error {
 
 	updatePayload, _ := json.Marshal(map[string]string{"type": "STATUS_UPDATE"})
 	ws.AppHub.Broadcast <- updatePayload
-	return c.JSON(http.StatusOK, map[string]string{"message": "Sipariş mermi gibi teslim edildi!"})
+	return c.JSON(http.StatusOK, map[string]string{"message": "Sipariş teslim edildi!"})
 }
 
 func GetActiveOrders(c echo.Context) error {

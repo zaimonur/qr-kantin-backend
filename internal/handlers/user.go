@@ -115,5 +115,5 @@ func AdminLoadBalance(c echo.Context) error {
 	}
 
 	tx.Commit()
-	return c.JSON(http.StatusOK, map[string]string{"message": "Bakiye mermi gibi yüklendi!"})
+	return c.JSON(http.StatusOK, map[string]string{"message": "Bakiye yüklendi!"})
 }

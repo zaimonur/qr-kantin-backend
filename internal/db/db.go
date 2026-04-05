@@ -35,7 +35,7 @@ func Connect() {
 	db.SetConnMaxLifetime(time.Hour) // Bağlantıların ömrü
 
 	Instance = db
-	log.Println("Sunucudaki DB'ye mermi gibi bağlandık!")
+	log.Println("Sunucudaki DB'ye bağlandık!")
 
 	// 2. Redis Bağlantısı
 	redisURL := os.Getenv("REDIS_URL")
@@ -53,8 +53,8 @@ func Connect() {
 	if _, err := RedisClient.Ping(ctx).Result(); err != nil {
 		log.Println("⚠️ Redis bağlantısı kurulamadı, cache devre dışı kalacak:", err)
 	} else {
-		log.Println("🚀 Redis mermi gibi bağlandı!")
+		log.Println("🚀 Redisbağlandı!")
 	}
 
-	log.Println("Sunucudaki DB'ye mermi gibi bağlandık!")
+	log.Println("Sunucudaki DB'ye bağlandık!")
 }

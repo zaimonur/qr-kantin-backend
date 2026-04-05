@@ -29,7 +29,7 @@ func AddMaterial(c echo.Context) error {
 			return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Stok güncellenemedi"})
 		}
 
-		return c.JSON(http.StatusOK, map[string]string{"message": "Mevcut malzemenin stoğu mermi gibi güncellendi!"})
+		return c.JSON(http.StatusOK, map[string]string{"message": "Mevcut malzemenin stoğu güncellendi!"})
 	}
 
 	// Malzeme yoksa yeni kayıt açar ve malzemeyi ekler
@@ -77,5 +77,5 @@ func DeleteMaterial(c echo.Context) error {
 		return c.JSON(http.StatusNotFound, map[string]string{"error": "Malzeme bulunamadı"})
 	}
 
-	return c.JSON(http.StatusOK, map[string]string{"message": "Malzeme mermi gibi silindi!"})
+	return c.JSON(http.StatusOK, map[string]string{"message": "Malzeme silindi!"})
 }

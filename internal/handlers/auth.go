@@ -80,7 +80,7 @@ func RegisterStudentByAdmin(c echo.Context) error {
 		return c.JSON(http.StatusConflict, map[string]string{"error": "Bu e-posta adresi zaten kullanımda"})
 	}
 
-	return c.JSON(http.StatusCreated, map[string]string{"message": "Öğrenci mermi gibi eklendi!", "id": lastID})
+	return c.JSON(http.StatusCreated, map[string]string{"message": "Öğrenci eklendi!", "id": lastID})
 }
 
 // RegisterTeacherByAdmin: Panelden Öğretmen Ekler
@@ -104,7 +104,7 @@ func RegisterTeacherByAdmin(c echo.Context) error {
 		return c.JSON(http.StatusConflict, map[string]string{"error": "Bu e-posta adresi zaten kullanımda"})
 	}
 
-	return c.JSON(http.StatusCreated, map[string]string{"message": "Öğretmen mermi gibi eklendi!", "id": lastID})
+	return c.JSON(http.StatusCreated, map[string]string{"message": "Öğretmen eklendi!", "id": lastID})
 }
 
 // RegisterAdminByAdmin: Panelden Yeni Yönetici/Kantinci Ekler
@@ -128,7 +128,7 @@ func RegisterAdminByAdmin(c echo.Context) error {
 		return c.JSON(http.StatusConflict, map[string]string{"error": "Bu e-posta adresi zaten kullanımda"})
 	}
 
-	return c.JSON(http.StatusCreated, map[string]string{"message": "Yeni yönetici mermi gibi eklendi!", "id": lastID})
+	return c.JSON(http.StatusCreated, map[string]string{"message": "Yeni yönetici eklendi!", "id": lastID})
 }
 
 // Login: Kimlik doğrulaması yapar

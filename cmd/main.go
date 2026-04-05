@@ -14,8 +14,10 @@ import (
 
 	"github.com/go-playground/validator/v10"
 	"github.com/joho/godotenv"
+	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"golang.org/x/time/rate"
 )
 
 type CustomValidator struct {
@@ -48,6 +50,14 @@ func main() {
 	e.Use(middleware.Logger())
 	e.Use(middleware.Recover())
 	e.Use(middleware.CORS())
+
+	//Prometheus metrik toplayıcısını başlat
+	e.Use(echoprometheus.NewMiddleware("qrkantin"))
+	// Grafana'nın verileri çekeceği gizli rota
+	e.GET("/metrics", echoprometheus.NewHandler())
+
+	//Her IP için saniyede maksimum 20 isteğe izin verir
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
 
 	// 5. WebSocket Merkezini (Hub) Arka Planda Başlat
 	go myWS.AppHub.Run()
