@@ -17,6 +17,7 @@ import (
 	"github.com/labstack/echo-contrib/echoprometheus"
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
+	"golang.org/x/time/rate"
 )
 
 type CustomValidator struct {
@@ -56,7 +57,7 @@ func main() {
 	e.GET("/metrics", echoprometheus.NewHandler())
 
 	//Her IP için saniyede maksimum 20 isteğe izin verir
-	//e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
+	e.Use(middleware.RateLimiter(middleware.NewRateLimiterMemoryStore(rate.Limit(20))))
 
 	// 5. WebSocket Merkezini (Hub) Arka Planda Başlat
 	go myWS.AppHub.Run()
