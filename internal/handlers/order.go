@@ -21,13 +21,14 @@ type CreateOrderRequest struct {
 }
 
 type AdminOrderResponse struct {
-	ID         string  `db:"id" json:"id"`
-	FullName   string  `db:"full_name" json:"full_name"`
-	TotalPrice float64 `db:"total_price" json:"total_price"`
-	Status     string  `db:"status" json:"status"`
-	Note       string  `db:"note" json:"note"`
-	CreatedAt  string  `db:"created_at" json:"created_at"`
-	QRToken    string  `db:"qr_code_token" json:"qr_token"`
+	ID         string              `db:"id" json:"id"`
+	FullName   string              `db:"full_name" json:"full_name"`
+	TotalPrice float64             `db:"total_price" json:"total_price"`
+	Status     string              `db:"status" json:"status"`
+	Note       string              `db:"note" json:"note"`
+	CreatedAt  string              `db:"created_at" json:"created_at"`
+	QRToken    string              `db:"qr_code_token" json:"qr_token"`
+	Items      []OrderItemResponse `json:"items"`
 }
 
 type CompleteOrderRequest struct {
@@ -63,15 +64,25 @@ func CreateOrder(c echo.Context) error {
 	}
 
 	var totalOrderPrice float64
+	var orderItemsForWS []OrderItemResponse
 
 	for _, item := range req.Items {
-		var productPrice float64
-		err = tx.Get(&productPrice, `SELECT price FROM products WHERE id = $1`, item.ProductID)
+		var p struct {
+			Price float64 `db:"price"`
+			Name  string  `db:"name"`
+		}
+		err = tx.Get(&p, `SELECT price, name FROM products WHERE id = $1`, item.ProductID)
 		if err != nil {
 			tx.Rollback()
 			return c.JSON(http.StatusNotFound, map[string]string{"error": "Menüde böyle bir ürün bulunamadı"})
 		}
-		totalOrderPrice += productPrice * float64(item.Quantity)
+		totalOrderPrice += p.Price * float64(item.Quantity)
+
+		orderItemsForWS = append(orderItemsForWS, OrderItemResponse{
+			ProductName: p.Name,
+			Quantity:    item.Quantity,
+			Price:       p.Price,
+		})
 	}
 
 	res, err := tx.Exec(`UPDATE users SET balance = balance - $1 WHERE id = $2 AND balance >= $1`, totalOrderPrice, userID)
@@ -141,6 +152,7 @@ func CreateOrder(c echo.Context) error {
 		"role":       "Öğrenci",
 		"created_at": createdAt,
 		"message":    "Yeni sipariş onayınızı bekliyor!",
+		"items":      orderItemsForWS,
 	}
 	if payload, err := json.Marshal(notification); err == nil {
 		ws.AppHub.Broadcast <- payload
@@ -281,8 +293,20 @@ func CompleteOrder(c echo.Context) error {
 }
 
 func GetActiveOrders(c echo.Context) error {
-	var orders []AdminOrderResponse
+	type FlatAdminOrderItem struct {
+		ID          string  `db:"id"`
+		FullName    string  `db:"full_name"`
+		TotalPrice  float64 `db:"total_price"`
+		Status      string  `db:"status"`
+		Note        string  `db:"note"`
+		CreatedAt   string  `db:"created_at"`
+		QRToken     string  `db:"qr_code_token"`
+		Quantity    int     `db:"quantity"`
+		Price       float64 `db:"price"`
+		ProductName string  `db:"product_name"`
+	}
 
+	var flatResults []FlatAdminOrderItem
 	query := `
 		SELECT 
 			o.id, 
@@ -291,22 +315,59 @@ func GetActiveOrders(c echo.Context) error {
 			o.status, 
 			COALESCE(o.note, '') as note,
 			CAST(o.created_at AS VARCHAR) as created_at, 
-			o.qr_code_token 
+			o.qr_code_token,
+			COALESCE(oi.quantity, 0) as quantity,
+			COALESCE(oi.unit_price, 0) as price,
+			COALESCE(p.name, 'Bilinmeyen Ürün') as product_name
 		FROM orders o 
 		LEFT JOIN users u ON o.user_id = u.id 
+		LEFT JOIN order_items oi ON o.id = oi.order_id
+		LEFT JOIN products p ON oi.product_id = p.id
 		WHERE o.status IN ('pending', 'approved', 'ready') 
 		ORDER BY o.created_at ASC`
 
-	err := db.Instance.Select(&orders, query)
+	err := db.Instance.Select(&flatResults, query)
 	if err != nil {
 		log.Println("Siparişleri Çekme Hatası:", err)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Aktif siparişler alınamadı"})
 	}
 
-	if orders == nil {
-		orders = []AdminOrderResponse{}
+	ordersMap := make(map[string]*AdminOrderResponse)
+	var orderKeys []string // Siparişlerin sırasını korumak için
+
+	for _, res := range flatResults {
+		if _, ok := ordersMap[res.ID]; !ok {
+			ordersMap[res.ID] = &AdminOrderResponse{
+				ID:         res.ID,
+				FullName:   res.FullName,
+				TotalPrice: res.TotalPrice,
+				Status:     res.Status,
+				Note:       res.Note,
+				CreatedAt:  res.CreatedAt,
+				QRToken:    res.QRToken,
+				Items:      []OrderItemResponse{},
+			}
+			orderKeys = append(orderKeys, res.ID)
+		}
+		if res.Quantity > 0 { // Eğer siparişin ürünü varsa listeye ekle
+			item := OrderItemResponse{
+				ProductName: res.ProductName,
+				Quantity:    res.Quantity,
+				Price:       res.Price,
+			}
+			ordersMap[res.ID].Items = append(ordersMap[res.ID].Items, item)
+		}
 	}
-	return c.JSON(http.StatusOK, orders)
+
+	var finalOrders []AdminOrderResponse
+	for _, id := range orderKeys {
+		finalOrders = append(finalOrders, *ordersMap[id])
+	}
+
+	if finalOrders == nil {
+		finalOrders = []AdminOrderResponse{}
+	}
+	return c.JSON(http.StatusOK, finalOrders)
 }
 
 func GetMyOrders(c echo.Context) error {
